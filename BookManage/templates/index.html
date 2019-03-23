@@ -2,13 +2,110 @@
 {% block title %}BMS{% endblock %}
 
 {% block navbar %}
-  <nav class="navbar navbar-light bg-light static-top">
-    <div class="container">
-      <a class="navbar-brand" href="#">Start Bootstrap</a>
-      <a class="btn btn-primary" href="#">Sign In</a>
-      <a class="btn btn-primary" href="#">Sign Up</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light static-top">
+  <div class="container">
+    <a class="navbar-brand" href="#">BookManagementSystem</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive"><span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home
+                <span class="sr-only">(current)</span>
+              </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="modal" data-target="#signin">Sign In</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="modal" data-target="#signup">Sign Up</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
+          About
+        </a>
+          <div class="dropdown-menu dropdown-menu-right animate slideIn" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">About Us</a>
+            <a class="dropdown-item" href="#">Acknowledge</a>
+          </div>
+        </li>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
+
+<!-- 注册窗口 -->
+<div id="signup" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-title">
+                <h1 class="text-center">注册</h1>
+            </div>
+            <div class="modal-body">
+                <form class="form-group" action="">
+                        <div class="form-group">
+                            <label for="">用户名</label>
+                            <input class="form-control" type="text" placeholder="6-15位字母或数字">
+                        </div>
+                        <div class="form-group">
+                            <label for="">密码</label>
+                            <input class="form-control" type="password" placeholder="至少6位字母或数字">
+                        </div>
+                        <div class="form-group">
+                            <label for="">再次输入密码</label>
+                            <input class="form-control" type="password" placeholder="至少6位字母或数字">
+                        </div>
+                        <div class="form-group">
+                            <label for="">邮箱</label>
+                            <input class="form-control" type="email" placeholder="例如:123@123.com">
+                        </div>
+                        <div class="text-right">
+                            <button class="btn btn-primary" type="submit">提交</button>
+                            <button class="btn btn-danger" data-dismiss="modal">取消</button>
+                        </div>
+                        <a href="" data-toggle="modal" data-dismiss="modal" data-target="#login">已有账号？点我登录</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 登录窗口 -->
+<div id="signin" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-title">
+                <h1 class="text-center">登录</h1>
+            </div>
+            <div class="modal-body">
+                <form class="form-group" action="">
+                        <div class="form-group">
+                            <label for="">用户名</label>
+                            <input class="form-control" type="text" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label for="">密码</label>
+                            <input class="form-control" type="password" placeholder="">
+                        </div>
+                        <div class="text-right">
+                            <button class="btn btn-primary" type="submit">登录</button>
+                            <button class="btn btn-danger" data-dismiss="modal">取消</button>
+                        </div>
+                        <a href="" data-toggle="modal" data-dismiss="modal" data-target="#register">还没有账号？点我注册</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block header %}
