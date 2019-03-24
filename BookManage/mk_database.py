@@ -27,6 +27,7 @@ cur.execute('''create table book
 (
     ISBN TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
+    author TEXT NOT NULL,
     category TEXT NOT NULL,
     address TEXT NOT NULL,
     count INTEGER NOT NULL
@@ -37,6 +38,7 @@ cur.execute('''insert into book
 values(
 "978-7-302-38141-9", 
 "编译原理",
+"老王",
 "计算机", 
 "501室",
 5

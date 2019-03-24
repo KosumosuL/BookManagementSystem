@@ -28,9 +28,9 @@ class User(db.Model):
         db.session.add(user)
         return db.session_commit()
 
-    # def update(self, user):
-    #     db.session.update(user)
-    #     return session_commit()
+    def update(self, user):
+        db.session.update(user)
+        return db.session_commit()
 
     def delete(self, ID):
         self.query.filter_by(ID=ID).delete()
@@ -49,6 +49,7 @@ class Book(db.Model):
     # limit ISBN format when input
     ISBN = db.Column(db.String(17), primary_key=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)
+    author = db.Column(db.String(50), nullable=False)
     category = db.Column(db.String(20), nullable=False)
     address = db.Column(db.String(20), nullable=False)
     count = db.Column(db.INTEGER, nullable=False)
@@ -56,9 +57,10 @@ class Book(db.Model):
     def __repr__(self):
         return '<Book %r>' % self.ISBN
 
-    def __init__(self, ISBN, name, category, address, count):
+    def __init__(self, ISBN, name, author, category, address, count):
         self.ISBN = ISBN
         self.name = name
+        self.author = author
         self.category = category
         self.address = address
         self.count = count
@@ -66,13 +68,16 @@ class Book(db.Model):
     def get(self, ISBN):
         return self.query.filter_by(ISBN=ISBN).first()
 
+    def getall(self):
+        return self.query.all()
+
     def add(self, book):
         db.session.add(book)
         return db.session_commit()
 
-    # def update(self, user):
-    #     db.session.update(user)
-    #     return session_commit()
+    def update(self, book):
+        db.session.update(book)
+        return db.session_commit()
 
     def delete(self, ISBN):
         self.query.filter_by(ISBN=ISBN).delete()
@@ -82,6 +87,7 @@ class Book(db.Model):
         return {
             'ISBN': book.ISBN,
             'name': book.name,
+            'author': book.author,
             'category': book.category,
             'address': book.address,
             'count': book.count
@@ -109,8 +115,11 @@ class Switch(db.Model):
         self.sreturntime = sreturntime
         self.returntime = returntime
 
-    def get(self, SID):
-        return self.query.filter_by(SID=SID).first()
+    def getbyISBN(self, ISBN):
+        return self.query.filter_by(ISBN=ISBN).all()
+
+    def getbyID(self, ID):
+        return self.query.filter_by(ID=ID).all()
 
     def add(self, switch):
         db.session.add(switch)
@@ -122,6 +131,10 @@ class Switch(db.Model):
 
     def delete(self, SID):
         self.query.filter_by(SID=SID).delete()
+        return db.session_commit()
+
+    def deletebyISBN(self, ISBN):
+        self.query.filter_by(ISBN=ISBN).delete()
         return db.session_commit()
 
     def out(self, switch):
