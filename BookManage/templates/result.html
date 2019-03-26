@@ -242,7 +242,7 @@
 <div class="container">
   <div class="card border-0 shadow my-5">
     <div class="card-body p-5">
-        <div style="width: 90%;margin: 0 auto">
+        <div style="width: 100%;margin: 0 auto">
             <table id="table" ></table>
         </div>
     </div>
@@ -253,17 +253,17 @@
 {% block scripts %}
   {{ super() }}
 <script type="text/javascript">
+    toastr.options.positionClass = 'toast-top-full-width';
+    toastr.info('按相关性搜索‘' + '{{ target }}' + '’结果如下');
     $(function () {
         $('#table').bootstrapTable({
             url: '/resultinfo',  // 请求数据源的路由
             dataType: "json",
             method: 'GET',                      //请求方式（*）
-            pagination: true, //前端处理分页
             singleSelect: false,//是否只能单选
-            search: true, //显示搜索框，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+            search: false, //显示搜索框，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
             sortable: true,
             sortOrder: 'asc',
-
             toolbar: '#toolbar', //工具按钮用哪个容器
             striped: true, //是否显示行间隔色
             cache: false, //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
@@ -275,14 +275,14 @@
             showRefresh: true, //显示刷新按钮
             minimumCountColumns: 2, //当列数小于此值时，将隐藏内容列下拉框
             clickToSelect: true, //设置true， 将在点击某行时，自动勾选rediobox 和 checkbox
-            height: 500, //表格高度，如果没有设置height属性，表格自动根据记录条数决定表格高度
+            {#height: 800, //表格高度，如果没有设置height属性，表格自动根据记录条数决定表格高度#}
             uniqueId: "id", //每一行的唯一标识，一般为主键列
             showToggle: true, //是否显示详细视图和列表视图的切换按钮
             cardView: false, //是否显示详细视图
-            detailView: true, //是否显示父子表，设置为 true 可以显示详细页面模式,在每行最前边显示+号
-            sidePagination: "server", //分页方式：client客户端分页，server服务端分页（*）
+            detailView: false, //是否显示父子表，设置为 true 可以显示详细页面模式,在每行最前边显示+号
+            sidePagination: "client", //分页方式：client客户端分页，server服务端分页（*）
             queryParams: {
-                target: {{ target }}
+                target: '{{ target }}'
             },
             columns: [{  //定义表头,这个表头必须定义,下边field后边跟的字段名字必须与后端传递的字段名字相同.如:id、name、price
                 field: 'ISBN',
@@ -312,7 +312,5 @@
             ],
         });
     });
-
-
 </script>
 {% endblock %}

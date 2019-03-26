@@ -45,6 +45,11 @@ def init_api(app):
             error = e
         return render_template('index.html', error=error)
 
+    @app.route('/logout')
+    def logout():
+        session.clear()
+        return render_template('index.html')
+
     @app.route('/signup', methods=['POST'])
     def signup():
         try:
@@ -93,8 +98,8 @@ def init_api(app):
             # info.append([book, histmp])
             info.append(book)
         print(info)
-        limit = request.form.get('limit', 10)  # 每页显示的条数
-        offset = request.form.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
+        limit = request.args.get('limit', 10)  # 每页显示的条数
+        offset = request.args.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
         print('get', limit)
         print('get  offset', offset)
         return jsonify({'total': len(info), 'rows': info[int(offset):(int(offset) + int(limit))]})
@@ -193,8 +198,8 @@ def init_api(app):
         for h in his:
             info.append(Switch.out(Switch, h))
         print(info)
-        limit = request.form.get('limit', 10)  # 每页显示的条数
-        offset = request.form.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
+        limit = request.args.get('limit', 10)  # 每页显示的条数
+        offset = request.args.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
         print('get', limit)
         print('get  offset', offset)
         return jsonify({'total': len(info), 'rows': info[int(offset):(int(offset) + int(limit))]})
@@ -253,26 +258,19 @@ def init_api(app):
             ans = 0
             for i in range(len(target)):
                 for j in range(i + 1, len(target) + 1):
-                    print(target[i:j])
                     ans += cal_relate(target[i:j], book['ISBN'] + ' ' + book['name'] + ' ' + book['author'] + ' ' + book['category'])
             if ans > 0:
                 result.append([book, ans])
-        print(result)
         result.sort(key=lambda relates: relates[1], reverse=True)
         info = []
         for book, ans in result:
             info.append(book)
-        limit = request.form.get('limit', 10)  # 每页显示的条数
-        offset = request.form.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
-        print('get', limit)
-        print('get  offset', offset)
-        return jsonify({'total': len(info), 'rows': info[int(offset):(int(offset) + int(limit))]})
+        return jsonify(info)
 
 
     @app.route('/easysearch', methods=['POST'])
     def easysearch():
         target = request.form.get('target')
-        print(target)
         return render_template('result.html', target=target)
 
     @app.route('/hsearch', methods=['POST'])
