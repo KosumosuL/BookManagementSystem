@@ -14,8 +14,13 @@
 
     {%- block styles %}
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/simple-sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-table/bootstrap-table.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/toastr/toastr.min.css') }}">
     {%- endblock styles %}
     {%- endblock head %}
@@ -26,12 +31,14 @@
     {%- endblock navbar %}
     {% block header %}
     {%- endblock header %}
-{#    {% block content -%}#}
-{#    {%- endblock content %}#}
+    {% block content -%}
+    {%- endblock content %}
     {% block scripts %}
-    <script src="{{ url_for('static', filename='vendor/jquery/jquery.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/toastr/toastr.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap-table/bootstrap-table.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap-table/locale/bootstrap-table-zh-CN.min.js') }}"></script>
     {%- endblock scripts %}
     {%- endblock body %}
   </body>

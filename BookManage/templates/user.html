@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% block title %}BMS{% endblock %}
+
+{% block navbar %}
+  <div class="d-flex" id="wrapper">
+
+    <!-- Sidebar -->
+    <div class="bg-light border-right" id="sidebar-wrapper">
+      <div class="sidebar-heading text-center">个人信息</div>
+      <div class="list-group list-group-flush">
+        {% for pi in pinfo %}
+        <a href="#" class="list-group-item list-group-item-action bg-light text-center">{{ pi }}</a>
+        {% endfor %}
+        <button class="btn btn-primary" data-toggle="modal" data-target="#modify">Modify</button>
+        <div id="modify" class="modal fade" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <button class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-title">
+                        <h1 class="text-center">修改个人信息</h1>
+                    </div>
+                    <div class="modal-body">
+                        <form name="signupform" class="form-group" action="/modify" method="post">
+                            <div class="col-sm-9 col-md-7 col-lg-9 mx-auto">
+                                <div class="form-group">
+                                    <label for="">账号</label>
+                                    <input name="ID" class="form-control" type="text" placeholder="长度5-12的数字和字母组合" required autofocus>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">名称</label>
+                                    <input name="name" class="form-control" type="text" placeholder="汉字" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">密码</label>
+                                    <input name="pwd" class="form-control" type="password" placeholder="长度5-12的数字和字母组合" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">确认密码</label>
+                                    <input name="repwd" class="form-control" type="password" placeholder="长度5-12的数字和字母组合" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">号码</label>
+                                    <input name="ph" class="form-control" type="password" placeholder="11位手机号码" required>
+                                    <label for=""></label>
+                                </div>
+                                <div class="text-center">
+                                    <script language="javascript">
+                                        function signupcheck(){
+                                            toastr.options.positionClass = 'toast-center-center';
+                                            var regular = /^[a-zA-Z0-9]{5,12}$/;
+                                            if(!regular.test(signupform.ID.value)){
+                                                toastr.error("账号输入不合法");
+                                                return false;
+                                            }
+                                            var rechine = /[\u4e00-\u9fa5]/;
+                                            if(!rechine.test(signupform.name.value)){
+                                                toastr.error("名称输入不合法");
+                                                return false;
+                                            }
+                                            if(!regular.test(signupform.pwd.value)){
+                                                toastr.error("密码输入不合法");
+                                                return false;
+                                            }
+                                            if(signupform.pwd.value !== signupform.repwd.value){
+                                                toastr.warning("两次密码输入不一致");
+                                                return false;
+                                            }
+                                            var reph = /(\d{3}-|\d{4}-)?(\d{8}|\d{7})?/;
+                                            if(!reph.test(signupform.ph.value)){
+                                                toastr.error("号码输入不合法");
+                                                return false;
+                                            }
+                                            return true;
+                                        }
+                                    </script>
+                                    <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" onclick="return signupcheck();">确认修改</button>
+                                    <label for=""></label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <button class="btn btn-primary" id="menu-toggle">toggle</button>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- <button class="btn btn-primary">add</button> -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Log Out</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                About
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" data-toggle="modal" data-target="#aboutus">About Us</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#acknowledge">Acknowledge</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- 关于我们窗口 -->
+      <div id="aboutus" class="modal fade">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-body">
+                      <button class="close" data-dismiss="modal">
+                          <span>&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-title">
+                      <h1 class="text-center">About Us</h1>
+                  </div>
+                  <div class="modal-body">
+                    <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
+                          <div class="form-group">
+                              <h2 class="text-center">Main program and subroutine</h2>
+                          </div>
+                          <div class="form-group">
+                            <h5 class="text-center">吴佩欣 916106840111</h5>
+                            <h5 class="text-center">张会阳 916106840742</h5>
+                            <h5 class="text-center">赵亮   9161010F0233</h5>
+                            <h5 class="text-center">陈冉   916106840118</h5>
+                            <h5 class="text-center">陈晨   916106840115</h5>
+                            <h5 class="text-center">韩欣良 916106840123</h5>
+                          </div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- 鸣谢窗口 -->
+      <div id="acknowledge" class="modal fade">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-body">
+                      <button class="close" data-dismiss="modal">
+                          <span>&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-title">
+                      <h1 class="text-center">Acknowledge</h1>
+                      <label for=""></label>
+                  </div>
+                  <div class="modal-body">
+                    <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
+                          <div class="form-group">
+                            <h5 class="text-center">Bootstrap</h5>
+                            <h5 class="text-center">Toastr</h5>
+                            <h5 class="text-center">Flask</h5>
+                          </div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+
+        <div style="width: 80%;margin: 0 auto">
+            <table id="table" ></table>
+        </div>
+
+
+    </div>
+    <!-- /#page-content-wrapper -->
+
+  </div>
+      <!-- Menu Toggle Script -->
+
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script>
+    $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+    });
+  </script>
+<script type="text/javascript">
+    $(function () {
+        $('#table').bootstrapTable({
+            url: '/userinfo',  // 请求数据源的路由
+            dataType: "json",
+            method: 'GET',                      //请求方式（*）
+            pagination: true, //前端处理分页
+            singleSelect: false,//是否只能单选
+            search: true, //显示搜索框，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+            sortable: true,
+            sortOrder: 'asc',
+
+            toolbar: '#toolbar', //工具按钮用哪个容器
+            striped: true, //是否显示行间隔色
+            cache: false, //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pageNumber: 1, //初始化加载第10页，默认第一页
+            pageSize: 10, //每页的记录行数（*）
+            pageList: [10, 20, 50, 100], //可供选择的每页的行数（*）
+            strictSearch: true,//设置为 true启用 全匹配搜索，false为模糊搜索
+            showColumns: true, //显示内容列下拉框
+            showRefresh: true, //显示刷新按钮
+            minimumCountColumns: 2, //当列数小于此值时，将隐藏内容列下拉框
+            clickToSelect: true, //设置true， 将在点击某行时，自动勾选rediobox 和 checkbox
+            {#        height: 500, //表格高度，如果没有设置height属性，表格自动根据记录条数决定表格高度#}
+            uniqueId: "id", //每一行的唯一标识，一般为主键列
+            showToggle: true, //是否显示详细视图和列表视图的切换按钮
+            cardView: false, //是否显示详细视图
+            {#        detailView: true, //是否显示父子表，设置为 true 可以显示详细页面模式,在每行最前边显示+号#}
+            sidePagination: "server", //分页方式：client客户端分页，server服务端分页（*）
+            columns: [{  //定义表头,这个表头必须定义,下边field后边跟的字段名字必须与后端传递的字段名字相同.如:id、name、price
+                field: 'SID',
+                title: 'SID',
+                align: 'center',
+            }, {
+                field: 'ISBN',
+                title: 'ISBN',
+                align: 'center'
+            }, {
+                field: 'ID',
+                title: 'ID',
+                align: 'center',
+            }, {
+                field: 'borrowtime',
+                title: '借书时间',
+                align: 'center'
+            }, {
+                field: 'sreturntime',
+                title: '应还时间',
+                align: 'center'
+            }, {
+                field: 'returntime',
+                title: '归还时间',
+                align: 'center'
+            }
+            ],
+        });
+    });
+
+
+</script>
+{% endblock %}

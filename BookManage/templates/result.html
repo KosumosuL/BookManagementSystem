@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}BMS{% endblock %}
 
+{%- block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fpi.css') }}">
+{% endblock %}
 {% block navbar %}
 
 <script type="text/javascript">
@@ -235,26 +239,80 @@
 {% endblock %}
 
 {% block content %}
-  <header class="masthead text-white text-center">
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-xl-9 mx-auto">
-          <h1 class="mb-5">Talk Less & Read More</h1>
+<div class="container">
+  <div class="card border-0 shadow my-5">
+    <div class="card-body p-5">
+        <div style="width: 90%;margin: 0 auto">
+            <table id="table" ></table>
         </div>
-        <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-          <form name="searchform" action="/easysearch" method="post">
-            <div class="form-row">
-              <div class="col-12 col-md-9 mb-2 mb-md-0">
-                <input type="text" name="target" class="form-control form-control-lg" placeholder="Input anything about the book you want" required autofocus>
-              </div>
-              <div class="col-12 col-md-3">
-                <button type="submit" class="btn btn-block btn-lg btn-primary">Search It!</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
-  </header>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+<script type="text/javascript">
+    $(function () {
+        $('#table').bootstrapTable({
+            url: '/resultinfo',  // 请求数据源的路由
+            dataType: "json",
+            method: 'GET',                      //请求方式（*）
+            pagination: true, //前端处理分页
+            singleSelect: false,//是否只能单选
+            search: true, //显示搜索框，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+            sortable: true,
+            sortOrder: 'asc',
+
+            toolbar: '#toolbar', //工具按钮用哪个容器
+            striped: true, //是否显示行间隔色
+            cache: false, //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pageNumber: 1, //初始化加载第10页，默认第一页
+            pageSize: 10, //每页的记录行数（*）
+            pageList: [10, 20, 50, 100], //可供选择的每页的行数（*）
+            strictSearch: true,//设置为 true启用 全匹配搜索，false为模糊搜索
+            showColumns: true, //显示内容列下拉框
+            showRefresh: true, //显示刷新按钮
+            minimumCountColumns: 2, //当列数小于此值时，将隐藏内容列下拉框
+            clickToSelect: true, //设置true， 将在点击某行时，自动勾选rediobox 和 checkbox
+            height: 500, //表格高度，如果没有设置height属性，表格自动根据记录条数决定表格高度
+            uniqueId: "id", //每一行的唯一标识，一般为主键列
+            showToggle: true, //是否显示详细视图和列表视图的切换按钮
+            cardView: false, //是否显示详细视图
+            detailView: true, //是否显示父子表，设置为 true 可以显示详细页面模式,在每行最前边显示+号
+            sidePagination: "server", //分页方式：client客户端分页，server服务端分页（*）
+            queryParams: {
+                target: {{ target }}
+            },
+            columns: [{  //定义表头,这个表头必须定义,下边field后边跟的字段名字必须与后端传递的字段名字相同.如:id、name、price
+                field: 'ISBN',
+                title: 'ISBN',
+                align: 'center',
+            }, {
+                field: 'name',
+                title: '书名',
+                align: 'center'
+            }, {
+                field: 'author',
+                title: '作者',
+                align: 'center',
+            }, {
+                field: 'category',
+                title: '分类',
+                align: 'center'
+            }, {
+                field: 'address',
+                title: '馆藏地',
+                align: 'center'
+            }, {
+                field: 'count',
+                title: '余量',
+                align: 'center'
+            }
+            ],
+        });
+    });
+
+
+</script>
 {% endblock %}

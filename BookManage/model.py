@@ -7,7 +7,7 @@ from BookManage import db
 
 class User(db.Model):
     __tablename__ = 'user'
-    ID = db.Column(db.String(12), primary_key=True, nullable=False)
+    ID = db.Column(db.String(15), primary_key=True, nullable=False)
     name = db.Column(db.String(20), nullable=False)
     password = db.Column(db.String(20), nullable=False)
     phonenum = db.Column(db.String(11), nullable=False)

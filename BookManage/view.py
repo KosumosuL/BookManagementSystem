@@ -11,15 +11,16 @@ def init_api(app):
     def index():
         return render_template('index.html')
 
-    @app.route('/login', methods=['POST'])
-    def login():
-        error = None
+    @app.route('/signin', methods=['POST'])
+    def signin():
         try:
             ID = request.form.get('ID')
-            password = request.form.get('password')
-            ident = request.form.get('ident')
-
-            if ident == 'admin':
+            password = request.form.get('pwd')
+            ident = request.form.get('isadmin')
+            print(ID)
+            print(password)
+            print(ident)
+            if ident:
                 if ID != app.config['MANAGER_ID']:
                     error = 'Invalid adminID'
                 elif password != app.config['MANAGER_PWD']:
@@ -27,11 +28,10 @@ def init_api(app):
                 else:
                     session['ident'] = 'admin'
                     session['ID'] = ID
-
-
                     return redirect(url_for('admin'))
-            elif ident == 'user':
+            else:
                 user = User.get(User, ID)
+                print(user)
                 if user is None:
                     error = 'Invalid userID'
                 elif password != user.password:
@@ -39,21 +39,19 @@ def init_api(app):
                 else:
                     session['ident'] = 'user'
                     session['ID'] = ID
-
-
                     return redirect(url_for('user'))
+                print(error)
         except Exception as e:
             error = e
         return render_template('index.html', error=error)
 
-    @app.route('/register', methods=['POST'])
-    def register():
-        error = None
+    @app.route('/signup', methods=['POST'])
+    def signup():
         try:
             ID = request.form.get('ID')
             name = request.form.get('name')
-            password = request.form.get('password')
-            phonenum = request.form.get('phone')
+            password = request.form.get('pwd')
+            phonenum = request.form.get('ph')
 
             if User.get(User, ID):
                 error = 'Existed userID'
@@ -82,43 +80,31 @@ def init_api(app):
             error = 'Invalid user, please login'
             return render_template('index.html', error=error)
 
-    @app.route('/admin', methods=['POST'])
-    def admin():
-        check_admin()
+    @app.route('/admininfo', methods=['GET'])
+    def admininfo():
         info = []
         books = Book.getall(Book)
         for book in books:
-            his = Switch.getbyISBN(Switch, ISBN=book.ISBN)
-            info.append([book, his])
-        return render_template('admin.html', info=info)
+            book = Book.out(Book, book)
+            # his = Switch.getbyISBN(Switch, ISBN=book['ISBN'])
+            # histmp = []
+            # for h in his:
+            #     histmp.append(Switch.out(Switch, h))
+            # info.append([book, histmp])
+            info.append(book)
+        print(info)
+        limit = request.form.get('limit', 10)  # 每页显示的条数
+        offset = request.form.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
+        print('get', limit)
+        print('get  offset', offset)
+        return jsonify({'total': len(info), 'rows': info[int(offset):(int(offset) + int(limit))]})
 
-    @app.route('/delhis', methods=['POST'])
-    def delhis():
+    @app.route('/admin')
+    def admin():
         check_admin()
-        error = None
-        try:
-            # cannot be modified, thus donot check
-            SID = request.form.get('SID')
+        pinfo = [app.config['MANAGER_ID'], app.config['MANAGER_NAME'], app.config['MANAGER_PH']]
+        return render_template('admin.html', pinfo=pinfo)
 
-            _ = Switch.delete(Switch, SID=SID)
-            return redirect(url_for('admin'))
-        except Exception as e:
-            error = e
-        return render_template('admin.html', error=error)
-
-    @app.route('/clearhis', methods=['POST'])
-    def clearhis():
-        check_admin()
-        error = None
-        try:
-            # check his in the foreend to ensure ISBN existed in Switch
-            ISBN = request.form.get('ISBN')
-
-            _ = Switch.deletebyISBN(Switch, ISBN=ISBN)
-            return redirect(url_for('admin'))
-        except Exception as e:
-            error = e
-        return render_template('admin.html', error=error)
 
     @app.route('/addbook', methods=['POST'])
     def addbook():
@@ -164,8 +150,9 @@ def init_api(app):
         error = None
         try:
             # cannot be modified, thus donot check
-            ISBN = request.form.get('ISBN')
-
+            # ISBN = request.form.get('ISBN')
+            ISBN = request.args.get("ISBN")
+            print(ISBN)
             _ = Book.delete(Book, ISBN=ISBN)
             return redirect(url_for('admin'))
         except Exception as e:
@@ -199,12 +186,29 @@ def init_api(app):
             error = e
         return render_template('index.html', error=error)
 
-    @app.route('/user', methods=['POST'])
+    @app.route('/userinfo', methods=['GET'])
+    def userinfo():
+        info = []
+        his = Switch.getbyID(Switch, ID=session['ID'])
+        for h in his:
+            info.append(Switch.out(Switch, h))
+        print(info)
+        limit = request.form.get('limit', 10)  # 每页显示的条数
+        offset = request.form.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
+        print('get', limit)
+        print('get  offset', offset)
+        return jsonify({'total': len(info), 'rows': info[int(offset):(int(offset) + int(limit))]})
+
+    @app.route('/user')
     def user():
         check_user()
-        user = User.get(User, ID=session['ID'])
-        his = Switch.getbyID(Switch, ID=user.ID)
-        return render_template('user.html', info=[user, his])
+        us = User.get(User, ID=session['ID'])
+        us = User.out(User, us)
+        pinfo = []
+        for key, val in us.items():
+            pinfo.append(val)
+        print(pinfo)
+        return render_template('user.html', pinfo=pinfo)
 
     @app.route('/modifyuser', methods=['POST'])
     def modifyuser():
@@ -237,21 +241,39 @@ def init_api(app):
             pos = bookinfo.find(tar, pos+1)
         return cnt * len(tar) * len(tar) * len(tar)
 
-    @app.route('/easysearch', methods=['POST'])
-    def easysearch():
+    @app.route('/resultinfo', methods=['GET'])
+    def resultinfo():
         books = Book.getall(Book)
-        target = request.form.get('target')
+        target = request.args.get('target')
+        print(target)
         result = []
         for book in books:
+            book = Book.out(Book, book)
+            print(book)
             ans = 0
             for i in range(len(target)):
                 for j in range(i + 1, len(target) + 1):
                     print(target[i:j])
-                    ans += cal_relate(target[i:j], book.ISBN + ' ' + book.name + ' ' + book.author + ' ' + book.category)
+                    ans += cal_relate(target[i:j], book['ISBN'] + ' ' + book['name'] + ' ' + book['author'] + ' ' + book['category'])
             if ans > 0:
                 result.append([book, ans])
+        print(result)
         result.sort(key=lambda relates: relates[1], reverse=True)
-        return render_template('result.html', result=result)
+        info = []
+        for book, ans in result:
+            info.append(book)
+        limit = request.form.get('limit', 10)  # 每页显示的条数
+        offset = request.form.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
+        print('get', limit)
+        print('get  offset', offset)
+        return jsonify({'total': len(info), 'rows': info[int(offset):(int(offset) + int(limit))]})
+
+
+    @app.route('/easysearch', methods=['POST'])
+    def easysearch():
+        target = request.form.get('target')
+        print(target)
+        return render_template('result.html', target=target)
 
     @app.route('/hsearch', methods=['POST'])
     def hsearch():
