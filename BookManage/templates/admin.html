@@ -2,15 +2,32 @@
 {% block title %}BMS{% endblock %}
 
 {% block navbar %}
+<script type="text/javascript">
+    function showalert(){
+        {% if welcome %}
+            toastr.options.positionClass = 'toast-top-full-width';
+            toastr.success('{{ welcome }}');
+        {% endif %}
+        {% if error %}
+            toastr.options.positionClass = 'toast-center-center';
+            toastr.error('{{ error }}');
+        {% endif %}
+    }
+    showalert();
+</script>
+<body onload="showalert()">
+
   <div class="d-flex" id="wrapper">
 
     <!-- Sidebar -->
     <div class="bg-light border-right" id="sidebar-wrapper">
       <div class="sidebar-heading text-center">个人信息</div>
       <div class="list-group list-group-flush">
-        {% for pi in pinfo %}
-        <a href="#" class="list-group-item list-group-item-action bg-light text-center">{{ pi }}</a>
-        {% endfor %}
+
+        <a href="#" class="list-group-item list-group-item-action bg-light">账号: {{ pinfo['ID'] }}</a>
+        <a href="#" class="list-group-item list-group-item-action bg-light">名称: {{ pinfo['name'] }}</a>
+        <a href="#" class="list-group-item list-group-item-action bg-light">号码: {{ pinfo['phonenum'] }}</a>
+
         <a href="#" class="list-group-item list-group-item-action bg-light text-center"> </a>
         <button class="btn btn-primary" data-toggle="modal" data-target="#add">添加</button>
           <div id="add" class="modal fade" tabindex="-1">
@@ -85,7 +102,7 @@
                                             return true;
                                         }
                                     </script>
-                                    <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" onclick="return addbookcheck();">确认修改</button>
+                                    <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" onclick="return addbookcheck();">确认添加</button>
                                     <label for=""></label>
                                 </div>
                             </div>
@@ -110,18 +127,18 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item active">
-              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="#">管理员空间 <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+              <a class="nav-link" href="{{ url_for('logout') }}">登出</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                About
+                关于
               </a>
               <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" data-toggle="modal" data-target="#aboutus">About Us</a>
-                <a class="dropdown-item" data-toggle="modal" data-target="#acknowledge">Acknowledge</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#aboutus">关于我们</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#acknowledge">致谢</a>
               </div>
             </li>
           </ul>
@@ -138,7 +155,7 @@
                       </button>
                   </div>
                   <div class="modal-title">
-                      <h1 class="text-center">About Us</h1>
+                      <h1 class="text-center">关于我们</h1>
                   </div>
                   <div class="modal-body">
                     <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
@@ -169,7 +186,7 @@
                       </button>
                   </div>
                   <div class="modal-title">
-                      <h1 class="text-center">Acknowledge</h1>
+                      <h1 class="text-center">致谢</h1>
                       <label for=""></label>
                   </div>
                   <div class="modal-body">
@@ -233,7 +250,7 @@
                             <div class="col-sm-9 col-md-7 col-lg-9 mx-auto">
                                 <div class="form-group">
                                     <label for="">ISBN</label>
-                                    <input name="ISBN" id="isbn" class="form-control" type="text" placeholder="使用'-'号分隔">
+                                    <input name="ISBN" id="isbn" class="form-control" type="text" placeholder="使用'-'号分隔" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label for="">书名</label>
@@ -302,11 +319,6 @@
         <div style="width: 80%;margin: 0 auto">
             <table id="table" ></table>
         </div>
-{#        <div id="toolbar" class="btn-group">#}
-{#            <button id="btn_add" type="button" class="btn btn-info btn-sm rightSize">#}
-{#                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增#}
-{#            </button>#}
-{#        </div>#}
 
     </div>
     <!-- /#page-content-wrapper -->
@@ -385,7 +397,6 @@
                     var data = row.ISBN + " " + row.name + " " + row.author + " " + row.category + " " + row.address + " " + row.count.toString();
                     result += "<a href='javascript:;' class='btn btn-xs blue' onclick=\"EditViewById('" + data + "')\" title='编辑'><span class='glyphicon glyphicon-pencil'>编辑</span></a>";
                     result += "<a href='javascript:;' class='btn btn-xs red' onclick=\"DeleteByIds('" + value + "')\" title='删除'><span class='glyphicon glyphicon-remove'>删除</span></a>";
-
                     return result;
                 }
             }
@@ -401,7 +412,7 @@ function DeleteByIds(row) {
 
 // 编辑用户
 function EditViewById(data) {
-    toastr.info(data);
+    {#toastr.info(data);#}
     var dat = data.trim().split(" ");
     $("#modify").modal("show");
     $('#isbn').val(dat[0]);

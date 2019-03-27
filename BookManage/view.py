@@ -17,9 +17,9 @@ def init_api(app):
             ID = request.form.get('ID')
             password = request.form.get('pwd')
             ident = request.form.get('isadmin')
-            print(ID)
-            print(password)
-            print(ident)
+            # print(ID)
+            # print(password)
+            # print(ident)
             if ident:
                 if ID != app.config['MANAGER_ID']:
                     error = 'Invalid adminID'
@@ -31,7 +31,6 @@ def init_api(app):
                     return redirect(url_for('admin'))
             else:
                 user = User.get(User, ID)
-                print(user)
                 if user is None:
                     error = 'Invalid userID'
                 elif password != user.password:
@@ -40,7 +39,6 @@ def init_api(app):
                     session['ident'] = 'user'
                     session['ID'] = ID
                     return redirect(url_for('user'))
-                print(error)
         except Exception as e:
             error = e
         return render_template('index.html', error=error)
@@ -91,30 +89,27 @@ def init_api(app):
         books = Book.getall(Book)
         for book in books:
             book = Book.out(Book, book)
-            # his = Switch.getbyISBN(Switch, ISBN=book['ISBN'])
-            # histmp = []
-            # for h in his:
-            #     histmp.append(Switch.out(Switch, h))
-            # info.append([book, histmp])
             info.append(book)
-        print(info)
+        # print(info)
         limit = request.args.get('limit', 10)  # 每页显示的条数
         offset = request.args.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
-        print('get', limit)
-        print('get  offset', offset)
+        # print('get', limit)
+        # print('get  offset', offset)
         return jsonify({'total': len(info), 'rows': info[int(offset):(int(offset) + int(limit))]})
 
     @app.route('/admin')
     def admin():
         check_admin()
-        pinfo = [app.config['MANAGER_ID'], app.config['MANAGER_NAME'], app.config['MANAGER_PH']]
-        return render_template('admin.html', pinfo=pinfo)
-
+        pinfo = {'ID':app.config['MANAGER_ID'], 'name':app.config['MANAGER_NAME'], 'phonenum':app.config['MANAGER_PH']}
+        return render_template('admin.html', pinfo=pinfo, welcome='欢迎来到管理员空间')
 
     @app.route('/addbook', methods=['POST'])
     def addbook():
         check_admin()
         error = None
+        welcome = None
+        pinfo = {'ID': app.config['MANAGER_ID'], 'name': app.config['MANAGER_NAME'],
+                 'phonenum': app.config['MANAGER_PH']}
         try:
             ISBN = request.form.get('ISBN')
             name = request.form.get('name')
@@ -123,7 +118,7 @@ def init_api(app):
             address = request.form.get('address')
             count = request.form.get('count')
 
-            if Book.Book(Book, ISBN):
+            if Book.get(Book, ISBN):
                 book = Book(
                     ISBN=ISBN,
                     name=name,
@@ -133,7 +128,6 @@ def init_api(app):
                     count=Book.get(Book, ISBN=ISBN).count+count
                 )
                 _ = Book.update(Book, book)
-                return redirect(url_for('admin'))
             else:
                 book = Book(
                     ISBN=ISBN,
@@ -144,30 +138,35 @@ def init_api(app):
                     count=count
                 )
                 _ = Book.add(Book, book)
-                return redirect(url_for('admin'))
+            welcome = '书籍信息添加成功'
         except Exception as e:
             error = e
-        return render_template('index.html', error=error)
+        return render_template('admin.html', pinfo=pinfo, error=error, welcome=welcome)
 
     @app.route('/delbook', methods=['POST'])
     def delbook():
         check_admin()
         error = None
+        welcome = None
+        pinfo = {'ID': app.config['MANAGER_ID'], 'name': app.config['MANAGER_NAME'],
+                 'phonenum': app.config['MANAGER_PH']}
         try:
             # cannot be modified, thus donot check
-            # ISBN = request.form.get('ISBN')
-            ISBN = request.args.get("ISBN")
+            ISBN = request.form.get('ISBN')
             print(ISBN)
             _ = Book.delete(Book, ISBN=ISBN)
-            return redirect(url_for('admin'))
+            welcome = '删除成功'
         except Exception as e:
             error = e
-        return render_template('admin.html', error=error)
+        return render_template('admin.html', pinfo=pinfo, error=error, welcome=welcome)
 
     @app.route('/modifybook', methods=['POST'])
     def modifybook():
         check_admin()
         error = None
+        welcome = None
+        pinfo = {'ID': app.config['MANAGER_ID'], 'name': app.config['MANAGER_NAME'],
+                 'phonenum': app.config['MANAGER_PH']}
         try:
             # ISBN cannot be modified thus donot check ID's existence
             ISBN = request.form.get('ISBN')
@@ -186,10 +185,10 @@ def init_api(app):
                 count=count
             )
             _ = Book.update(Book, book)
-            return redirect(url_for('admin'))
+            welcome = '书籍信息修改成功'
         except Exception as e:
             error = e
-        return render_template('index.html', error=error)
+        return render_template('admin.html', pinfo=pinfo, error=error, welcome=welcome)
 
     @app.route('/userinfo', methods=['GET'])
     def userinfo():
@@ -197,11 +196,11 @@ def init_api(app):
         his = Switch.getbyID(Switch, ID=session['ID'])
         for h in his:
             info.append(Switch.out(Switch, h))
-        print(info)
+        # print(info)
         limit = request.args.get('limit', 10)  # 每页显示的条数
         offset = request.args.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
-        print('get', limit)
-        print('get  offset', offset)
+        # print('get', limit)
+        # print('get  offset', offset)
         return jsonify({'total': len(info), 'rows': info[int(offset):(int(offset) + int(limit))]})
 
     @app.route('/user')
@@ -209,22 +208,21 @@ def init_api(app):
         check_user()
         us = User.get(User, ID=session['ID'])
         us = User.out(User, us)
-        pinfo = []
-        for key, val in us.items():
-            pinfo.append(val)
-        print(pinfo)
-        return render_template('user.html', pinfo=pinfo)
+        return render_template('user.html', pinfo=us, welcome='欢迎来到用户空间')
 
     @app.route('/modifyuser', methods=['POST'])
     def modifyuser():
         check_user()
         error = None
+        welcome = None
+        us = User.get(User, ID=session['ID'])
+        us = User.out(User, us)
         try:
             # ID cannot be modified thus donot check ID's existence
             ID = request.form.get('ID')
             name = request.form.get('name')
-            password = request.form.get('password')
-            phonenum = request.form.get('phone')
+            password = request.form.get('pwd')
+            phonenum = request.form.get('ph')
 
             user = User(
                 ID=session['ID'],
@@ -233,10 +231,10 @@ def init_api(app):
                 phonenum=phonenum
             )
             _ = User.update(User, user)
-            return redirect(url_for('user'))
+            welcome = '个人信息修改成功'
         except Exception as e:
             error = e
-        return render_template('user.html', error=error)
+        return render_template('user.html', pinfo=us, error=error, welcome=welcome)
 
     def cal_relate(tar, bookinfo):
         pos = bookinfo.find(tar)
@@ -248,31 +246,83 @@ def init_api(app):
 
     @app.route('/resultinfo', methods=['GET'])
     def resultinfo():
-        books = Book.getall(Book)
         target = request.args.get('target')
-        print(target)
-        result = []
-        for book in books:
-            book = Book.out(Book, book)
-            print(book)
-            ans = 0
-            for i in range(len(target)):
-                for j in range(i + 1, len(target) + 1):
-                    ans += cal_relate(target[i:j], book['ISBN'] + ' ' + book['name'] + ' ' + book['author'] + ' ' + book['category'])
-            if ans > 0:
-                result.append([book, ans])
-        result.sort(key=lambda relates: relates[1], reverse=True)
-        info = []
-        for book, ans in result:
-            info.append(book)
-        return jsonify(info)
+        target = target.replace('&#39;', '\'')
+        target = eval(target)
 
+        if target['mode'] == 'easy':
+            books = Book.getall(Book)
+            result = []
+            target = target['tar']
+            for book in books:
+                book = Book.out(Book, book)
+                ans = 0
+                for i in range(len(target)):
+                    for j in range(i + 1, len(target) + 1):
+                        ans += cal_relate(target[i:j], book['ISBN'] + ' ' + book['name'] + ' ' + book['author'] + ' ' + book['category'])
+                if ans > 0:
+                    result.append([book, ans])
+            result.sort(key=lambda relates: relates[1], reverse=True)
+            info = []
+            for book, ans in result:
+                info.append(book)
+            # print(info)
+            return jsonify(info)
+        elif target['mode'] == 'strict':
+            info = []
+            if len(target['relat']) == 0:
+                sql = 'SELECT * FROM book where ' + target['attr'][0] + '=\'' + target['sear'][0] + '\''
+                books = Book.search(Book, sql)
+                for book in books:
+                    book = Book.out(Book, book)
+                    info.append(book)
+            else:
+                sql = 'SELECT * FROM book where ' + target['attr'][0] + '=\'' + target['sear'][0] + '\''
+                attr, sear, relat = target['attr'], target['sear'], target['relat']
+                for i in range(len(relat)):
+                    sql += ' ' + relat[i] + ' ' + attr[i+1] + '=\'' + sear[i+1] + '\''
+                books = Book.search(Book, sql)
+                for book in books:
+                    book = Book.out(Book, book)
+                    info.append(book)
+            # print(info)
+            return jsonify(info)
+        else:
+            pass
 
     @app.route('/easysearch', methods=['POST'])
     def easysearch():
-        target = request.form.get('target')
+        target = {}
+        target['mode'] = 'easy'
+        target['tar'] = request.form.get('target')
         return render_template('result.html', target=target)
 
-    @app.route('/hsearch', methods=['POST'])
-    def hsearch():
-        pass
+    @app.route('/strictsearch', methods=['POST'])
+    def strictsearch():
+        target = {}
+        try:
+            row = request.form.get('row')
+            row = int(row)
+            attr, sear, relat = [], [], []
+            attr_1 = request.form.get('attr_1')
+            sear_1 = request.form.get('search_1')
+            attr.append(attr_1)
+            sear.append(sear_1)
+            for i in range(2, row+1):
+                relation = request.form.get('relation_' + str(i))
+                attribute = request.form.get('attr_' + str(i))
+                search = request.form.get('search_' + str(i))
+                relat.append(relation)
+                attr.append(attribute)
+                sear.append(search)
+            target['mode'] = 'strict'
+            target['attr'] = attr
+            target['sear'] = sear
+            target['relat'] = relat
+        except Exception as e:
+            print(e)
+        return render_template('result.html', target=target)
+
+    @app.route('/search')
+    def search():
+        return render_template('search.html')

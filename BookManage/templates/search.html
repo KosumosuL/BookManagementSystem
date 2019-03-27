@@ -1,13 +1,10 @@
 {% extends "base.html" %}
 {% block title %}BMS{% endblock %}
 
-{%- block styles %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/fpi.css') }}">
-{% endblock %}
 {% block navbar %}
 
 <script type="text/javascript">
+    var row = 1;
     function showalert(){
         {% if error %}
             toastr.options.positionClass = 'toast-center-center';
@@ -28,12 +25,9 @@
               <a class="nav-link" href="{{ url_for('index') }}">首页</a>
           </li>
         <li class="nav-item active">
-          <a class="nav-link" href="#">结果
+          <a class="nav-link" href="#">高级搜索
                 <span class="sr-only">(current)</span>
               </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('search') }}">高级搜索</a>
         </li>
         {% if session['ID'] %}
             <li class="nav-item">
@@ -253,83 +247,124 @@
 </div>
 {% endblock %}
 
-{% block content %}
-<div class="container">
-  <div class="card border-0 shadow my-5">
-    <div class="card-body p-5">
-        <div style="width: 100%;margin: 0 auto">
-            <table id="table" ></table>
+{% block header %}
+  <header class="masthead text-white text-center">
+    <div class="container">
+      <form class="form-data" action="/strictsearch" method="post" style="text-align: center;" name="sear">
+        <h2>高级搜索</h2>
+        <br>
+        <br>
+        <table style="font-size:18px;" align="center" id="table">
+            <input type="hidden" name="row">
+            <tr>
+                <td style="text-align: center;">
+                    <button type="button" class="btn btn-xs btn-success" onclick="addTableRow();">+</button>
+                    <button type="button" class="btn btn-xs btn-danger" onclick="delTableRow();">-</button>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                        <select class="selectpicker" name="attr_1_hidden" style="width: 120px; height: 40px">
+                            <option value="whatever" selected>请选择字段</option>
+                            <option value="ISBN">ISBN</option>
+                        <option value="name">书名</option>
+                            <option value="author">作者</option>
+                            <option value="category">分类</option>
+                        </select>
+                        <input type="hidden" name="attr_1">
+                        </span>
+                        <input type="text" class="form-control" placeholder="45个字符以内" name="search_1" style="width: 400px; height: 40px">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="row">&nbsp</div>
+                </td>
+            </tr>
+        </table>
+        <div class="container" align="center" style="width: 370px;">
+            <button class="btn btn-lg btn-primary btn-block" type="submit" name="complex_search" value="complex_search" onclick="return check();">搜索</button>
         </div>
+    </form>
     </div>
-  </div>
-</div>
+  </header>
 {% endblock %}
 
 {% block scripts %}
   {{ super() }}
 <script type="text/javascript">
-    toastr.options.positionClass = 'toast-top-full-width';
-    {% if target['tar'] %}
-    toastr.info('按相关性搜索‘' + '{{ target['tar'] }}' + '’结果如下');
-    {% else %}
-    toastr.info('高级搜索结果如下');
-    {% endif %}
-    $(function () {
-        $('#table').bootstrapTable({
-            url: '/resultinfo',  // 请求数据源的路由
-            dataType: "json",
-            method: 'GET',                      //请求方式（*）
-            singleSelect: false,//是否只能单选
-            search: false, //显示搜索框，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
-            sortable: true,
-            sortOrder: 'asc',
-            toolbar: '#toolbar', //工具按钮用哪个容器
-            striped: true, //是否显示行间隔色
-            cache: false, //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
-            pageNumber: 1, //初始化加载第10页，默认第一页
-            pageSize: 10, //每页的记录行数（*）
-            pageList: [10, 20, 50, 100], //可供选择的每页的行数（*）
-            strictSearch: true,//设置为 true启用 全匹配搜索，false为模糊搜索
-            showColumns: true, //显示内容列下拉框
-            showRefresh: true, //显示刷新按钮
-            minimumCountColumns: 2, //当列数小于此值时，将隐藏内容列下拉框
-            clickToSelect: true, //设置true， 将在点击某行时，自动勾选rediobox 和 checkbox
-            {#height: 800, //表格高度，如果没有设置height属性，表格自动根据记录条数决定表格高度#}
-            uniqueId: "id", //每一行的唯一标识，一般为主键列
-            showToggle: true, //是否显示详细视图和列表视图的切换按钮
-            cardView: false, //是否显示详细视图
-            detailView: false, //是否显示父子表，设置为 true 可以显示详细页面模式,在每行最前边显示+号
-            sidePagination: "client", //分页方式：client客户端分页，server服务端分页（*）
-            queryParams: {
-                target: '{{ target }}'
-            },
-            columns: [{  //定义表头,这个表头必须定义,下边field后边跟的字段名字必须与后端传递的字段名字相同.如:id、name、price
-                field: 'ISBN',
-                title: 'ISBN',
-                align: 'center',
-            }, {
-                field: 'name',
-                title: '书名',
-                align: 'center'
-            }, {
-                field: 'author',
-                title: '作者',
-                align: 'center',
-            }, {
-                field: 'category',
-                title: '分类',
-                align: 'center'
-            }, {
-                field: 'address',
-                title: '馆藏地',
-                align: 'center'
-            }, {
-                field: 'count',
-                title: '余量',
-                align: 'center'
+    function addTableRow() {
+        if(row === 5){
+            toastr.warning("最多只能有五个条件");
+            return;
+        }
+        row += 1;
+        var tr="<tr><td><input type=\"checkbox\" name=\"check" + row.toString() + "\" checked style=\"display: none\"/>" +
+            "<select class=\"selectpicker\" name=\"relation_" + row.toString() +
+            "_hidden\" style=\"font-size: 10px; height: 40px\"><option value=\"and\" selected>并且</option><option value=\"or\">或者</option></select><input type=\"hidden\" name=\"relation_" + row.toString() +
+            "\"></td>" +
+            "<td><div class=\"input-group\"><span class=\"input-group-addon\"><select class=\"selectpicker\" name=\"attr_" + row.toString() +
+            "_hidden\" style=\"width: 120px; height: 40px\"><option value=\"whatever\" selected>请选择字段</option><option value=\"ISBN\">ISBN</option><option value=\"name\">书名</option><option value=\"author\">作者</option><option value=\"category\">分类</option></select><input type=\"hidden\" name=\"attr_" + row.toString() +
+            "\"></span><input type=\"text\" class=\"form-control\" placeholder=\"45个字符以内\" name=\"search_" + row.toString() +
+            "\" style=\"width: 400px; height: 40px\"></div></td>" +
+            "</tr><tr><td>" + "<input type=\"checkbox\" name=\"check" + row.toString() + "\" checked style=\"display: none\"/></td><td><div class=\"row\">&nbsp</div></td></tr>";
+        $("#table").append(tr);
+    }
+    function delTableRow(){
+        if(row > 1){
+            var checked = document.getElementsByName('check'+row.toString());
+            var len = checked.length;
+            for(var i=len-1;i>=0;i--){
+                if(checked[i].checked==true){
+                    document.getElementById('table').deleteRow(checked[i].parentNode.parentNode.rowIndex);
+                }
             }
-            ],
-        });
-    });
+            row -= 1;
+        }
+    }
+</script>
+<script language="javascript">
+    function check(){
+        sear.row.value = row;
+        sear.attr_1.value = sear.attr_1_hidden.value;
+        if(sear.attr_1.value==="whatever"){
+            toastr.warning("请选择字段");
+            return false;
+        }
+        if(row >= 2){
+            sear.attr_2.value = sear.attr_2_hidden.value;
+            sear.relation_2.value = sear.relation_2_hidden.value;
+            if(sear.attr_2.value === "whatever"){
+                toastr.warning("请选择字段");
+                return false;
+            }
+        }
+        if(row >= 3){
+            sear.attr_3.value = sear.attr_3_hidden.value;
+            sear.relation_3.value = sear.relation_3_hidden.value;
+            if(sear.attr_3.value === "whatever"){
+                toastr.warning("请选择字段");
+                return false;
+            }
+        }
+        if(row >= 4){
+            sear.attr_4.value = sear.attr_4_hidden.value;
+            sear.relation_4.value = sear.relation_4_hidden.value;
+            if(sear.attr_4.value === "whatever"){
+                toastr.warning("请选择字段");
+                return false;
+            }
+        }
+        if(row >= 5){
+            sear.attr_5.value = sear.attr_5_hidden.value;
+            sear.relation_5.value = sear.relation_5_hidden.value;
+            if(sear.attr_5.value === "whatever"){
+                toastr.warning("请选择字段");
+                return false;
+            }
+        }
+        return true;
+    }
 </script>
 {% endblock %}

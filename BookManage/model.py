@@ -1,6 +1,6 @@
 from flask import Flask
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 from flask_sqlalchemy import SQLAlchemy
 
 from BookManage import db
@@ -25,16 +25,29 @@ class User(db.Model):
         return self.query.filter_by(ID=ID).first()
 
     def add(self, user):
-        db.session.add(user)
-        return db.session_commit()
+        try:
+            db.session.add(user)
+            return db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
     def update(self, user):
-        db.session.update(user)
-        return db.session_commit()
+        try:
+            self.query.filter_by(ID=user.ID).delete()
+            db.session.add(user)
+            return db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
     def delete(self, ID):
-        self.query.filter_by(ID=ID).delete()
-        return db.session_commit()
+        try:
+            self.query.filter_by(ID=ID).delete()
+            return db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
     def out(self, user):
         return {
@@ -68,20 +81,37 @@ class Book(db.Model):
     def get(self, ISBN):
         return self.query.filter_by(ISBN=ISBN).first()
 
+    def search(self, sql):
+        # return self.query.from_statement(text(sql)).all()
+        return db.session.execute(sql)
+
     def getall(self):
         return self.query.all()
 
     def add(self, book):
-        db.session.add(book)
-        return db.session_commit()
+        try:
+            db.session.add(book)
+            return db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
     def update(self, book):
-        db.session.update(book)
-        return db.session_commit()
+        try:
+            self.query.filter_by(ISBN=book.ISBN).delete()
+            db.session.add(book)
+            return db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
     def delete(self, ISBN):
-        self.query.filter_by(ISBN=ISBN).delete()
-        return db.session_commit()
+        try:
+            self.query.filter_by(ISBN=ISBN).delete()
+            return db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
     def out(self, book):
         return {
@@ -121,21 +151,21 @@ class Switch(db.Model):
     def getbyID(self, ID):
         return self.query.filter_by(ID=ID).all()
 
-    def add(self, switch):
-        db.session.add(switch)
-        return db.session_commit()
+    # def add(self, switch):
+    #     db.session.add(switch)
+    #     return db.session_commit()
 
     # def update(self, user):
     #     db.session.update(user)
     #     return session_commit()
 
-    def delete(self, SID):
-        self.query.filter_by(SID=SID).delete()
-        return db.session_commit()
-
-    def deletebyISBN(self, ISBN):
-        self.query.filter_by(ISBN=ISBN).delete()
-        return db.session_commit()
+    # def delete(self, SID):
+    #     self.query.filter_by(SID=SID).delete()
+    #     return db.session_commit()
+    #
+    # def deletebyISBN(self, ISBN):
+    #     self.query.filter_by(ISBN=ISBN).delete()
+    #     return db.session_commit()
 
     def out(self, switch):
         return {

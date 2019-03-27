@@ -21,23 +21,32 @@
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="#">Home
+          <a class="nav-link" href="#">首页
                 <span class="sr-only">(current)</span>
               </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" data-toggle="modal" data-target="#signin">Sign In</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" data-toggle="modal" data-target="#signup">Sign Up</a>
-        </li>
+        {% if session['ID'] %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('user') }}">用户空间</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('logout') }}">登出</a>
+            </li>
+        {% else %}
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="modal" data-target="#signin">登录</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="modal" data-target="#signup">注册</a>
+            </li>
+        {% endif %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true">
-          About
+          关于
         </a>
           <div class="dropdown-menu dropdown-menu-right animate slideIn" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" data-toggle="modal" data-target="#aboutus">About Us</a>
-            <a class="dropdown-item" data-toggle="modal" data-target="#acknowledge">Acknowledge</a>
+            <a class="dropdown-item" data-toggle="modal" data-target="#aboutus">关于我们</a>
+            <a class="dropdown-item" data-toggle="modal" data-target="#acknowledge">致谢</a>
           </div>
         </li>
       </ul>
@@ -78,7 +87,7 @@
                         </div>
                         <div class="form-group">
                             <label for="">号码</label>
-                            <input name="ph" class="form-control" type="password" placeholder="11位手机号码" required>
+                            <input name="ph" class="form-control" type="text" placeholder="11位手机号码" required>
                             <label for=""></label>
                         </div>
                         <div class="text-center">
@@ -186,7 +195,7 @@
                 </button>
             </div>
             <div class="modal-title">
-                <h1 class="text-center">About Us</h1>
+                <h1 class="text-center">关于我们</h1>
             </div>
             <div class="modal-body">
                 <div class="col-sm-9 col-md-7 col-lg-8 mx-auto">
@@ -217,7 +226,7 @@
                 </button>
             </div>
             <div class="modal-title">
-                <h1 class="text-center">Acknowledge</h1>
+                <h1 class="text-center">致谢</h1>
                 <label for=""></label>
             </div>
             <div class="modal-body">
